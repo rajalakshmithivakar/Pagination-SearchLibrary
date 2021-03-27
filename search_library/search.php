@@ -66,24 +66,29 @@ class searching
             
         }
         $input_new= preg_replace($pattern_date_btn, '', $input_new); 
-
+        
         $pattern_email= "/\b[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+.[a-zA-Z]{2,4}\b/";
         if(preg_match_all($pattern_email, $input_new, $output) )
         {
             $email=$output[0][0];    
         }
+       
         $input_new= preg_replace('/\b[\d]+\b/', '', $input_new); 
-        $input_new = preg_replace("/\b[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+.[a-zA-Z]{2,4}\b/",'',$input_new);  
+        // $input_new = preg_replace("/\b[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+.[a-zA-Z]{2,4}\b/",'',$input_new);  
         $pattern_string = "/\b[a-zA-Z_]+\b|\b\w*\d\w*\b/";
-        if(preg_match_all($pattern_string, $input_new, $output))
-        {   
-            $name_ex_comp=$output[0];
-            for ($i=0; $i < sizeof($name_ex_comp); $i++) 
-            {   
-                array_push($expert_and_company, $name_ex_comp[$i]); 
-            }
+        array_push($expert_and_company, $input_new);
+        // if(preg_match_all($pattern_string, $input_new, $output))
+        // {   
+        //     $name_ex_comp=$output[0];
+        //     print_r($name_ex_comp);
+        //     for ($i=0; $i < sizeof($name_ex_comp); $i++) 
+        //     {   
+        //         array_push($expert_and_company, $name_ex_comp[$i]); 
+        //     }
              
-        }
+        // }else{
+        //     echo "pattern not match";
+        // }
         $data['string']=$expert_and_company; 
         array_push($data['string'], $email); 
         $data['email']=$email;    
@@ -91,7 +96,7 @@ class searching
         {
             echo "string";
         }
-
+       
         foreach ($query_data as $key => $value_q)
         {   
             if(!empty($data['string']))
@@ -101,9 +106,9 @@ class searching
                     if(!empty($expert_and_company))
                     {
                         $attachment=array();
-                        foreach ($expert_and_company as $key => $value) 
+                        foreach (explode(",",$value_q['search_col_name']) as $key => $value) 
                         {    
-                            array_push($attachment,''.$value_q['search_col_name'].' LIKE "%'.$value.'%"'); 
+                            array_push($attachment,''.$value.' LIKE "%'.$expert_and_company[0].'%"'); 
                         }
                         $append_string_in_sql=implode(' OR ', $attachment);
                         $query='SELECT '.$value_q['get_colms'].' FROM '.$value_q['table_name'].' WHERE '.$append_string_in_sql.'';
@@ -279,6 +284,7 @@ class searching
             {
                 $ids[$get_ids[$i]] = array();
             }
+            
             foreach($result as $key => $value)
             {
                 if(isset($result[$key][$get_ids[$i]]))
